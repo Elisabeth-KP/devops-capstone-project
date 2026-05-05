@@ -1,3 +1,11 @@
+devops-capstone-project
+
+This repository contains the DevOps Capstone Project. It demonstrates the implementation of DevOps practices including version control, CI/CD pipelines, containerization, and deployment strategies.
+
+The project is part of the IBM DevOps learning program and showcases the use of modern tools to build, test, and deploy applications efficiently.
+
+
+
 # DevOps Capstone Template
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
