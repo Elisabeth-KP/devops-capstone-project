@@ -136,6 +136,22 @@ class TestAccountService(TestCase):
     self.assertEqual(data["email"], "updated@email.com")
     self.assertEqual(data["address"], "New Address")
 
+    def test_delete_account(self):
+    """It should delete an existing account"""
+
+    # Create account first
+    account = self._create_accounts(1)[0]
+
+    # Delete it
+    resp = self.client.delete(f"{BASE_URL}/{account.id}")
+
+    # Check response
+    self.assertEqual(resp.status_code, 204)
+
+    # Try to get it again → should fail
+    resp = self.client.get(f"{BASE_URL}/{account.id}")
+    self.assertEqual(resp.status_code, 404)
+    
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
         response = self.client.post(BASE_URL, json={"name": "not enough data"})
