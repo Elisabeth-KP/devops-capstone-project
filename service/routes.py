@@ -64,10 +64,11 @@ def create_accounts():
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
 
-    accounts = Account.all()
-    results = [a.serialize() for a in accounts]
+    app.logger.info("Request to list all accounts")
 
-    return results, 200
+    accounts = Account.all()
+
+    return [account.serialize() for account in accounts], 200
 
 
 ######################################################################
