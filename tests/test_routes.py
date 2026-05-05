@@ -108,6 +108,34 @@ class TestAccountService(TestCase):
         self.assertEqual(new_account["phone_number"], account.phone_number)
         self.assertEqual(new_account["date_joined"], str(account.date_joined))
 
+  def test_update_account(self):
+    """It should update an existing account"""
+
+    # Create an account first
+    account = self._create_accounts(1)[0]
+
+    # New data to update
+    updated_data = {
+        "name": "Updated Name",
+        "email": "updated@email.com",
+        "address": "New Address"
+    }
+
+    # Send PUT request
+    resp = self.client.put(
+        f"{BASE_URL}/{account.id}",
+        json=updated_data
+    )
+
+    # Check response
+    self.assertEqual(resp.status_code, 200)
+
+    data = resp.get_json()
+
+    self.assertEqual(data["name"], "Updated Name")
+    self.assertEqual(data["email"], "updated@email.com")
+    self.assertEqual(data["address"], "New Address")
+
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
         response = self.client.post(BASE_URL, json={"name": "not enough data"})
