@@ -4,6 +4,9 @@ This repository contains the DevOps Capstone Project. It demonstrates the implem
 
 The project is part of the IBM DevOps learning program and showcases the use of modern tools to build, test, and deploy applications efficiently.
 
+# devops-capstone-project
+
+![Build Status](https://github.com/Elisabeth-KP/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
 
 
 # DevOps Capstone Template
