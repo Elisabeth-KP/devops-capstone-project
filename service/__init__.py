@@ -17,9 +17,13 @@ app = Flask(__name__)
 app.config.from_object("service.config")
 
 db.init_app(app)
-talisman = Talisman(app, content_security_policy={
-    'default-src': "'self'"
-})
+talisman = Talisman(
+    app,
+    content_security_policy={
+        'default-src': "'self'",
+        'object-src': "'none'"
+    }
+)
 CORS(app)
 
 # Import the routes After the Flask app is created
