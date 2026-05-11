@@ -28,7 +28,10 @@ class TestAccountService(TestCase):
     def setUpClass(cls):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
-        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+
+        # FORCE SQLITE (VERY IMPORTANT)
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+
         app.logger.setLevel(logging.CRITICAL)
         init_db(app)
 
