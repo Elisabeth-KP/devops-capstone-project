@@ -11,14 +11,14 @@ from flask_cors import CORS
 from service import config
 from service.common import log_handlers
 
-# Create Flask application
+from service.models import db   # 👈 REQUIRED FIX
+
 app = Flask(__name__)
-# IMPORTANT: load config first
+
 app.config.from_object("service.config")
 
-# THEN initialize extensions
 db.init_app(app)
-talisman = Talisman(app, force_https=False)
+talisman = Talisman(app)
 CORS(app)
 
 # Import the routes After the Flask app is created
