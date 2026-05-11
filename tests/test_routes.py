@@ -29,7 +29,7 @@ class TestAccountService(TestCase):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
 
-        # FORCE SQLITE (VERY IMPORTANT)
+        # FORCE SQLITE (critical fix)
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
 
         app.logger.setLevel(logging.CRITICAL)
