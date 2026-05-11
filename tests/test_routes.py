@@ -17,7 +17,7 @@ from service.routes import app
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI",
-    "postgresql://postgres:postgres@localhost:5432/postgres"
+    "sqlite:///test.db"
 )
 
 BASE_URL = "/accounts"
