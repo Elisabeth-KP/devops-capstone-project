@@ -22,7 +22,8 @@ talisman = Talisman(
     content_security_policy={
         'default-src': "'self'",
         'object-src': "'none'"
-    }
+    },
+force_https=False
 )
 CORS(app)
 
