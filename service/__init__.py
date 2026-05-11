@@ -13,6 +13,11 @@ from service.common import log_handlers
 
 # Create Flask application
 app = Flask(__name__)
+# IMPORTANT: load config first
+app.config.from_object("service.config")
+
+# THEN initialize extensions
+db.init_app(app)
 talisman = Talisman(app, force_https=False)
 CORS(app)
 app.config.from_object(config)
