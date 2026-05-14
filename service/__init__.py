@@ -48,4 +48,6 @@ except Exception as error:  # pylint: disable=broad-except
     # gunicorn requires exit code 4 to stop spawning workers when they die
     sys.exit(4)
 
-app.logger.info("Service initialized!")
+app.logger.info(
+    "Service initialized successfully and ready to accept requests"
+)
