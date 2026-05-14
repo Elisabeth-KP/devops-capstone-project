@@ -100,6 +100,7 @@ class TestAccountService(TestCase):
                 response.headers.get(key),
                 value
             )
+          
     def test_index(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
