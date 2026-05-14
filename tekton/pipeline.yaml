@@ -1,11 +1,8 @@
-#
-# Pipeline for CI/CD
-#
----
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: cd-pipeline
+
 spec:
   workspaces:
     - name: pipeline-workspace
@@ -14,8 +11,11 @@ spec:
     - name: repo-url
     - name: branch
       default: main
+    - name: build-image
 
   tasks:
+
+    # ---------------- INIT ----------------
     - name: init
       taskRef:
         name: cleanup
@@ -23,20 +23,22 @@ spec:
         - name: source
           workspace: pipeline-workspace
 
+    # ---------------- CLONE ----------------
     - name: clone
       taskRef:
         name: git-clone
       runAfter:
         - init
-      workspaces:
-        - name: output
-          workspace: pipeline-workspace
       params:
         - name: url
           value: $(params.repo-url)
         - name: revision
           value: $(params.branch)
+      workspaces:
+        - name: output
+          workspace: pipeline-workspace
 
+    # ---------------- LINT ----------------
     - name: lint
       taskRef:
         name: flake8
@@ -46,6 +48,7 @@ spec:
         - name: source
           workspace: pipeline-workspace
 
+    # ---------------- TESTS ----------------
     - name: tests
       taskRef:
         name: nose
@@ -59,3 +62,39 @@ spec:
           value: "sqlite:///test.db"
         - name: args
           value: "-v --with-spec --spec-color"
+
+    # ---------------- BUILD ----------------
+    - name: build
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      runAfter:
+        - lint
+        - tests
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+      params:
+        - name: IMAGE
+          value: "$(params.build-image)"
+
+    # ---------------- DEPLOY ----------------
+    - name: deploy
+      taskRef:
+        name: openshift-client
+        kind: ClusterTask
+      runAfter:
+        - build
+      workspaces:
+        - name: manifest-dir
+          workspace: pipeline-workspace
+      params:
+        - name: SCRIPT
+          value: |
+            echo "Updating manifest..."
+            sed -i "s|IMAGE_NAME_HERE|$(params.build-image)|g" deploy/deployment.yaml
+            cat deploy/deployment.yaml
+
+            echo "Deploying to OpenShift..."
+            oc apply -f deploy/
+            oc get pods -l app=accounts
