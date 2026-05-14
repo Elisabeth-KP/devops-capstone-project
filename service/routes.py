@@ -27,14 +27,10 @@ def health():
 @app.route("/")
 def index():
     """Root URL response"""
-    return (
-        jsonify(
-            name="Account REST API Service",
-            version="1.0",
-            # paths=url_for("list_accounts", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    return jsonify(
+    name="Account REST API Service",
+    version="1.0"
+), status.HTTP_200_OK
 
 
 ######################################################################
@@ -58,17 +54,11 @@ def create_accounts():
 
     message = account.serialize()
 
-    location_url = url_for(
-        "get_accounts",
-        account_id=account.id,
-        _external=True
-    )
+    location_url = url_for("get_accounts", account_id=account.id, _external=True)
 
-    return make_response(
-        jsonify(message),
-        status.HTTP_201_CREATED,
-        {"Location": location_url}
-    )
+    response = make_response(jsonify(message), status.HTTP_201_CREATED)
+    response.headers["Location"] = location_url
+    return response
 
 
 ######################################################################
