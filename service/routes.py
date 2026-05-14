@@ -14,7 +14,6 @@ from . import app  # Import Flask application
 # Health Endpoint
 ############################################################
 
-
 @app.route("/health")
 def health():
     """Health Status"""
@@ -24,7 +23,6 @@ def health():
 ######################################################################
 # GET INDEX
 ######################################################################
-
 
 @app.route("/")
 def index():
@@ -43,34 +41,42 @@ def index():
 # CREATE A NEW ACCOUNT
 ######################################################################
 
-
 @app.route("/accounts", methods=["POST"])
 def create_accounts():
     """
     Creates an Account
-    This endpoint will create an Account based the data in the body that is posted
+    This endpoint will create an Account based the data in the body
+    that is posted
     """
     app.logger.info("Request to create an Account")
+
     check_content_type("application/json")
+
     account = Account()
     account.deserialize(request.get_json())
     account.create()
+
     message = account.serialize()
-    # Uncomment once get_accounts has been implemented
-    # location_url = url_for("get_accounts", account_id=account.id, _external=True)
-    location_url = url_for("get_accounts", account_id=account.id, _external=True)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+    location_url = url_for(
+        "get_accounts",
+        account_id=account.id,
+        _external=True
     )
+
+    return make_response(
+        jsonify(message),
+        status.HTTP_201_CREATED,
+        {"Location": location_url}
+    )
+
 
 ######################################################################
 # LIST ALL ACCOUNTS
 ######################################################################
 
-
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
-
     app.logger.info("Request to list all accounts")
 
     accounts = Account.all()
@@ -81,7 +87,6 @@ def list_accounts():
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
-
 
 @app.route("/accounts/<int:account_id>", methods=["GET"])
 def get_accounts(account_id):
@@ -95,9 +100,8 @@ def get_accounts(account_id):
 
 
 ######################################################################
-# UPDATE AN EXISTING ACCOUNT
+# UPDATE AN ACCOUNT
 ######################################################################
-
 
 @app.route("/accounts/<int:account_id>", methods=["PUT"])
 def update_account(account_id):
@@ -106,19 +110,15 @@ def update_account(account_id):
 
     account = Account.find(account_id)
 
-    # 404 if not found
     if not account:
         abort(404, f"Account with id [{account_id}] not found")
 
-    # Get JSON data from request
     data = request.get_json()
 
-    # Update fields
     account.name = data.get("name", account.name)
     account.email = data.get("email", account.email)
     account.address = data.get("address", account.address)
 
-    # Save changes
     account.update()
 
     return account.serialize(), 200
@@ -128,7 +128,6 @@ def update_account(account_id):
 # DELETE AN ACCOUNT
 ######################################################################
 
-
 @app.route("/accounts/<int:account_id>", methods=["DELETE"])
 def delete_account(account_id):
 
@@ -136,27 +135,27 @@ def delete_account(account_id):
 
     account = Account.find(account_id)
 
-    # If not found → 404
     if not account:
         abort(404, f"Account with id [{account_id}] not found")
 
-    # Delete account
     account.delete()
 
     return "", 204
 
 
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
+# UTILITY FUNCTION
 ######################################################################
-
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""
     content_type = request.headers.get("Content-Type")
+
     if content_type and content_type == media_type:
         return
+
     app.logger.error("Invalid Content-Type: %s", content_type)
+
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}",
