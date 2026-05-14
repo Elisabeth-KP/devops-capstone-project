@@ -19,4 +19,7 @@ def init_logging(app, logger_name: str):
     )
     for handler in app.logger.handlers:
         handler.setFormatter(formatter)
-    app.logger.info("Logging handler established")
+    app.logger.info(
+        "A very long logging message "
+        "that exceeds 79 characters limit ..."
+    )
