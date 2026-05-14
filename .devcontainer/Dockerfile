@@ -14,7 +14,10 @@ RUN apt-get update && \
         jq \
         software-properties-common \
         python3-pip \
-        python3-dev
+        python3-dev \
+        build-essential \
+        gcc \
+        g++
 
 # Installing K3D for local Kubernetes development
 RUN curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh" | sudo bash
