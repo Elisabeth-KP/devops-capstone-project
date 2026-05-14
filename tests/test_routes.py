@@ -80,12 +80,12 @@ class TestAccountService(TestCase):
             status.HTTP_200_OK
         )
 
-         # Check for CORS header
+        # Check for CORS header
         self.assertEqual(
             response.headers.get('Access-Control-Allow-Origin'),
             '*'
         )
-      
+
         headers = {
             'X-Frame-Options': 'SAMEORIGIN',
             'X-Content-Type-Options': 'nosniff',
@@ -100,6 +100,7 @@ class TestAccountService(TestCase):
                 response.headers.get(key),
                 value
             )
+
     def test_index(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
