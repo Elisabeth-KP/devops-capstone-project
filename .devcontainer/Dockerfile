@@ -47,7 +47,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Set up the Python development environment
 WORKDIR /home/project
-RUN python3 -m pip install --upgrade pip wheel
+RUN python3 -m pip install --upgrade pip wheel setuptools
 
 ENV PORT 8000
 EXPOSE $PORT
