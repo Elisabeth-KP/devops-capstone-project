@@ -14,9 +14,9 @@ if not DATABASE_URI:
     DATABASE_NAME = os.getenv("DATABASE_NAME", "postgres")
     DATABASE_HOST = os.getenv("DATABASE_HOST", "localhost")
 
-    DATABASE_URI = DATABASE_URI or (
-    f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}"
-    f"@{DATABASE_HOST}:5432/{DATABASE_NAME}"
+    DATABASE_URI = (
+        f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}"
+        f"@{DATABASE_HOST}:5432/{DATABASE_NAME}"
     )
 
 # Configure SQLAlchemy
