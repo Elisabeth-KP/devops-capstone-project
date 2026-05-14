@@ -1,6 +1,7 @@
 #
-# CD Pipeline
+# CI/CD Pipeline
 #
+
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
@@ -17,7 +18,9 @@ spec:
     - name: build-image
 
   tasks:
-    # 1. Clean workspace
+    ####################################################
+    # INIT
+    ####################################################
     - name: init
       taskRef:
         name: cleanup
@@ -25,12 +28,14 @@ spec:
         - name: source
           workspace: pipeline-workspace
 
-    # 2. Clone repo
+    ####################################################
+    # CLONE
+    ####################################################
     - name: clone
-      taskRef:
-        name: git-clone
       runAfter:
         - init
+      taskRef:
+        name: git-clone
       workspaces:
         - name: output
           workspace: pipeline-workspace
@@ -40,39 +45,45 @@ spec:
         - name: revision
           value: $(params.branch)
 
-    # 3. Lint (flake8)
+    ####################################################
+    # LINT
+    ####################################################
     - name: lint
-      taskRef:
-        name: flake8
       runAfter:
         - clone
+      taskRef:
+        name: flake8
       workspaces:
         - name: source
           workspace: pipeline-workspace
 
-    # 4. Tests (nose)
+    ####################################################
+    # TESTS (NOSE)
+    ####################################################
     - name: tests
-      taskRef:
-        name: nose
       runAfter:
         - clone
+      taskRef:
+        name: nose
       workspaces:
         - name: source
           workspace: pipeline-workspace
       params:
-        - name: database_uri
-          value: "sqlite:///test.db"
         - name: args
           value: "-v --with-spec --spec-color"
+        - name: database_uri
+          value: "sqlite:///test.db"
 
-    # 5. Build image
+    ####################################################
+    # BUILD
+    ####################################################
     - name: build
-      taskRef:
-        name: buildah
-        kind: ClusterTask
       runAfter:
         - lint
         - tests
+      taskRef:
+        name: buildah
+        kind: ClusterTask
       workspaces:
         - name: source
           workspace: pipeline-workspace
