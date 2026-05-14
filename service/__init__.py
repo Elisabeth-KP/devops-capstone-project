@@ -20,10 +20,10 @@ db.init_app(app)
 talisman = Talisman(
     app,
     content_security_policy={
-        'default-src': "'self'",
-        'object-src': "'none'"
+        "default-src": "'self'",
+        "object-src": "'none'",
     },
-force_https=False
+    force_https=False,
 )
 CORS(app)
 
