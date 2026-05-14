@@ -1,12 +1,8 @@
-#
-# CI/CD Pipeline
-#
-
----
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: cd-pipeline
+
 spec:
   workspaces:
     - name: pipeline-workspace
@@ -18,9 +14,7 @@ spec:
     - name: build-image
 
   tasks:
-    ####################################################
-    # INIT
-    ####################################################
+    # ---------------- INIT ----------------
     - name: init
       taskRef:
         name: cleanup
@@ -28,62 +22,54 @@ spec:
         - name: source
           workspace: pipeline-workspace
 
-    ####################################################
-    # CLONE
-    ####################################################
+    # ---------------- CLONE ----------------
     - name: clone
-      runAfter:
-        - init
       taskRef:
         name: git-clone
-      workspaces:
-        - name: output
-          workspace: pipeline-workspace
+      runAfter:
+        - init
       params:
         - name: url
           value: $(params.repo-url)
         - name: revision
           value: $(params.branch)
+      workspaces:
+        - name: output
+          workspace: pipeline-workspace
 
-    ####################################################
-    # LINT
-    ####################################################
+    # ---------------- LINT ----------------
     - name: lint
-      runAfter:
-        - clone
       taskRef:
         name: flake8
+      runAfter:
+        - clone
       workspaces:
         - name: source
           workspace: pipeline-workspace
 
-    ####################################################
-    # TESTS (NOSE)
-    ####################################################
+    # ---------------- TESTS ----------------
     - name: tests
-      runAfter:
-        - clone
       taskRef:
         name: nose
+      runAfter:
+        - clone
       workspaces:
         - name: source
           workspace: pipeline-workspace
       params:
-        - name: args
-          value: "-v --with-spec --spec-color"
         - name: database_uri
           value: "sqlite:///test.db"
+        - name: args
+          value: "-v --with-spec --spec-color"
 
-    ####################################################
-    # BUILD
-    ####################################################
+    # ---------------- BUILD ----------------
     - name: build
-      runAfter:
-        - lint
-        - tests
       taskRef:
         name: buildah
         kind: ClusterTask
+      runAfter:
+        - lint
+        - tests
       workspaces:
         - name: source
           workspace: pipeline-workspace
