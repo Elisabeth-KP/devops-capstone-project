@@ -1,7 +1,5 @@
 """
-Account Service
-
-This microservice handles the lifecycle of Accounts
+Account Service - REST API
 """
 
 from flask import jsonify, request, make_response, abort, url_for
@@ -11,22 +9,20 @@ from . import app
 
 
 # ============================================================
-# Health Endpoint
+# Health
 # ============================================================
 
 @app.route("/health")
 def health():
-    """Health Status"""
-    return jsonify(dict(status="OK")), status.HTTP_200_OK
+    return jsonify(status="OK"), status.HTTP_200_OK
 
 
 # ============================================================
-# GET INDEX
+# Index
 # ============================================================
 
 @app.route("/")
 def index():
-    """Root URL response"""
     return jsonify(
         name="Account REST API Service",
         version="1.0"
@@ -34,12 +30,12 @@ def index():
 
 
 # ============================================================
-# CREATE ACCOUNT
+# Create Account
 # ============================================================
 
 @app.route("/accounts", methods=["POST"])
 def create_accounts():
-    """Creates an Account"""
+
     app.logger.info("Request to create an Account")
 
     check_content_type("application/json")
@@ -48,38 +44,35 @@ def create_accounts():
     account.deserialize(request.get_json())
     account.create()
 
-    message = account.serialize()
+    response = make_response(
+        jsonify(account.serialize()),
+        status.HTTP_201_CREATED
+    )
 
-    location_url = url_for(
+    response.headers["Location"] = url_for(
         "get_accounts",
         account_id=account.id,
         _external=True
     )
 
-    response = make_response(
-        jsonify(message),
-        status.HTTP_201_CREATED
-    )
-    response.headers["Location"] = location_url
-
     return response
 
 
 # ============================================================
-# LIST ACCOUNTS
+# List Accounts
 # ============================================================
 
 @app.route("/accounts", methods=["GET"])
 def list_accounts():
-    """List all accounts"""
+
     app.logger.info("Request to list all accounts")
 
     accounts = Account.all()
-    return [a.serialize() for a in accounts], 200
+    return jsonify([a.serialize() for a in accounts]), 200
 
 
 # ============================================================
-# READ ACCOUNT
+# Get Account
 # ============================================================
 
 @app.route("/accounts/<int:account_id>", methods=["GET"])
@@ -90,11 +83,11 @@ def get_accounts(account_id):
     if not account:
         abort(404, "Account not found")
 
-    return account.serialize(), 200
+    return jsonify(account.serialize()), 200
 
 
 # ============================================================
-# UPDATE ACCOUNT
+# Update Account
 # ============================================================
 
 @app.route("/accounts/<int:account_id>", methods=["PUT"])
@@ -115,11 +108,11 @@ def update_account(account_id):
 
     account.update()
 
-    return account.serialize(), 200
+    return jsonify(account.serialize()), 200
 
 
 # ============================================================
-# DELETE ACCOUNT
+# Delete Account
 # ============================================================
 
 @app.route("/accounts/<int:account_id>", methods=["DELETE"])
@@ -138,19 +131,16 @@ def delete_account(account_id):
 
 
 # ============================================================
-# UTILITY
+# Utility
 # ============================================================
 
 def check_content_type(media_type):
-    """Validate request Content-Type"""
+
     content_type = request.headers.get("Content-Type")
 
-    if content_type == media_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s", content_type)
-
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {media_type}"
-    )
+    if content_type != media_type:
+        app.logger.error("Invalid Content-Type: %s", content_type)
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {media_type}"
+        )
